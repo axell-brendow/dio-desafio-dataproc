@@ -21,6 +21,49 @@ O desafio consiste em efetuar um processamento de dados utilizando o produto Dat
 1. Fazer o upload dos arquivos ```contador.py``` e ```livro.txt``` para o bucket criado (instruções abaixo)
     - https://cloud.google.com/storage/docs/uploading-objects
 
+1. Criar um cluster Hadoop utilizando o serviço Dataproc:
+    ```
+    gcloud dataproc clusters create cluster-desafio-dataproc \
+    --enable-component-gateway \
+    --region us-central1 \
+    --zone us-central1-a \
+    --master-machine-type n1-standard-2 \
+    --master-boot-disk-size 500 \
+    --num-workers 3 \
+    --worker-machine-type n1-standard-2 \
+    --worker-boot-disk-size 500 \
+    --image-version 2.0-debian10 \
+    --optional-components JUPYTER,ZEPPELIN,ZOOKEEPER \
+    --project desafio-dataproc-322111
+    ```
+1. Se quiser enviar o primeiro job de teste:
+    ```
+    POST /v1/projects/desafio-dataproc-322111/regions/us-central1/jobs:submit/
+    {
+      "projectId": "desafio-dataproc-322111",
+      "job": {
+        "placement": {
+          "clusterName": "cluster-desafio-dataproc"
+        },
+        "statusHistory": [],
+        "reference": {
+          "jobId": "initial-job",
+          "projectId": "desafio-dataproc-322111"
+        },
+        "sparkJob": {
+          "mainClass": "org.apache.spark.examples.SparkPi",
+          "properties": {},
+          "jarFileUris": [
+            "file:///usr/lib/spark/examples/jars/spark-examples.jar"
+          ],
+          "args": [
+            "1000"
+          ]
+        }
+      }
+    }
+    ```
+
 1. Utilizar o código em um cluster Dataproc, executando um Job do tipo PySpark chamando ```gs://{SEU_BUCKET}/contador.py```
 1. O Job irá gerar uma pasta no bucket chamada ```resultado```. Dentro dessa pasta o arquivo ```part-00000``` irá conter a lista de palavras e quantas vezes ela é repetida em todo o livro.
 
